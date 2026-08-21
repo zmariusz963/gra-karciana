@@ -350,9 +350,9 @@ body {
   flex: 1;
   max-width: 160px;
   aspect-ratio: 3/4;
-  border: 3px solid #f4e4c8;
-  border-radius: 14px;
-  background: linear-gradient(160deg, #6e0f22 0%, #a3132f 55%, #c41e3a 100%);
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, #4a2f9e 0%, #7b3fd6 55%, #9a4de0 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -360,46 +360,48 @@ body {
   padding: 14px 8px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 12px 28px rgba(20,4,10,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 28px rgba(20,8,50,0.5), 0 0 0 1px rgba(255,255,255,0.08) inset;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.pile:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(20,4,10,0.6), 0 0 0 1px rgba(0,0,0,0.15); }
+.pile:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(20,8,50,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset; }
 .pile:active { transform: scale(0.96); }
 .pile:disabled { opacity: 0.3; cursor: default; }
 .pile-stack {
   position: absolute;
-  inset: 7px;
-  border-radius: 8px;
+  inset: 9px;
+  border-radius: 12px;
   background:
-    repeating-linear-gradient(45deg, rgba(244,228,200,0.14) 0 3px, transparent 3px 14px),
-    repeating-linear-gradient(-45deg, rgba(244,228,200,0.14) 0 3px, transparent 3px 14px),
-    linear-gradient(160deg, rgba(0,0,0,0.08), transparent 60%);
-  border: 1.5px solid rgba(244,228,200,0.7);
+    repeating-conic-gradient(from 45deg, rgba(255,255,255,0.10) 0deg 12deg, transparent 12deg 24deg),
+    repeating-conic-gradient(from 0deg, transparent 0deg 24deg, rgba(255,255,255,0.05) 24deg 25deg),
+    linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02) 60%);
+  border: 2px solid rgba(255,215,150,0.4);
   overflow: hidden;
 }
 .pile-stack::before {
   content: '';
   position: absolute;
   inset: 6px;
-  border: 1px solid rgba(244,228,200,0.45);
-  border-radius: 5px;
+  border: 1px solid rgba(255,215,150,0.28);
+  border-radius: 9px;
 }
 .pile-stack::after {
-  content: '🃏';
+  content: '?';
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.7rem;
-  background: #f4e4c8;
-  border: 2px solid #6e0f22;
-  box-shadow: 0 0 0 3px rgba(244,228,200,0.35);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: rgba(255,215,150,0.85);
+  background: radial-gradient(circle, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 70%);
+  border: 1.5px solid rgba(255,215,150,0.45);
+  box-shadow: 0 0 14px rgba(255,184,77,0.2);
 }
 .pile-label {
   position: relative;
