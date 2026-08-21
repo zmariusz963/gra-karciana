@@ -334,10 +334,15 @@
   function startTimer(deadline) {
     clearInterval(state.timerInterval);
     const total = ANSWER_TIME_MS_CLIENT;
+    state.lowTimeAlerted = false;
     function tick() {
       const remaining = Math.max(0, deadline - Date.now());
       timerNumber.textContent = Math.ceil(remaining / 1000);
       timerFill.style.transform = `scaleX(${remaining / total})`;
+      if (remaining <= 1000 && !state.lowTimeAlerted) {
+        state.lowTimeAlerted = true;
+        window.beepAndVibrate();
+      }
       if (remaining <= 0) clearInterval(state.timerInterval);
     }
     timerFill.style.transition = 'none';

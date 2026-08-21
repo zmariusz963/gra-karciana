@@ -57,7 +57,7 @@ function shuffle(arr) {
 }
 
 function collectQuestions(category, difficulty) {
-  const categories = category === 'mix' ? ['polska', 'swiat'] : [category];
+  const categories = category === 'mix' ? Object.keys(QUESTIONS) : [category];
   const difficulties = difficulty === 'mix' ? ['latwy', 'sredni', 'trudny'] : [difficulty];
   let pool = [];
   categories.forEach((c) => {

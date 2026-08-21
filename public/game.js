@@ -119,7 +119,7 @@
   }
 
   function collectQuestions(category, difficulty) {
-    const categories = category === 'mix' ? ['polska', 'swiat'] : [category];
+    const categories = category === 'mix' ? Object.keys(QUESTIONS) : [category];
     const difficulties = difficulty === 'mix' ? ['latwy', 'sredni', 'trudny'] : [difficulty];
     let pool = [];
     categories.forEach((c) => {
@@ -205,6 +205,7 @@
 
   function startTimer() {
     state.timeLeft = ANSWER_TIME_MS;
+    state.lowTimeAlerted = false;
     timerFill.style.transition = 'none';
     timerFill.style.transform = 'scaleX(1)';
     timerNumber.textContent = Math.ceil(state.timeLeft / 1000);
@@ -219,6 +220,10 @@
       const elapsed = Date.now() - startedAt;
       const remaining = Math.max(0, ANSWER_TIME_MS - elapsed);
       timerNumber.textContent = Math.ceil(remaining / 1000);
+      if (remaining <= 1000 && !state.lowTimeAlerted) {
+        state.lowTimeAlerted = true;
+        window.beepAndVibrate();
+      }
       if (remaining <= 0) {
         clearInterval(state.timerInterval);
         onTimeUp();
