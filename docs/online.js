@@ -382,6 +382,11 @@
   function renderEnd() {
     const sorted = [...state.players].sort((a, b) => b.score - a.score);
     const topScore = sorted[0] ? sorted[0].score : 0;
+    if (topScore > 0) {
+      window.recordWin(sorted.filter((p) => p.score === topScore).map((p) => p.name));
+    } else {
+      window.renderWinsTable();
+    }
     finalScoresEl.innerHTML = sorted
       .map((p) => {
         const entries = state.history.filter((h) => h.player === p.name);

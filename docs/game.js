@@ -297,6 +297,11 @@
     questionOverlay.classList.add('hidden');
     const sorted = [...state.players].sort((a, b) => b.score - a.score);
     const topScore = sorted[0].score;
+    if (topScore > 0) {
+      window.recordWin(sorted.filter((p) => p.score === topScore).map((p) => p.name));
+    } else {
+      window.renderWinsTable();
+    }
     finalScoresEl.innerHTML = sorted
       .map((p) => {
         const correct = p.history.filter((h) => h.isCorrect).length;

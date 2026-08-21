@@ -67,6 +67,39 @@ body {
   margin: 0;
 }
 
+/* RANKING ZWYCIESTW - na telefonie zwykla karta w tresci, od szerszych ekranow lewituje w prawym gornym rogu */
+.wins-panel {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.wins-panel h3 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #cabfe0;
+}
+.wins-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.wins-table td { padding: 4px 0; }
+.wins-table td:last-child { text-align: right; font-weight: 800; color: var(--accent); }
+.wins-table .empty-row td { color: #9484bd; font-style: italic; }
+
+@media (min-width: 700px) {
+  .wins-panel {
+    position: fixed;
+    top: 24px;
+    right: max(20px, calc((100vw - 480px) / 2 - 170px));
+    width: 170px;
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-bottom: 0;
+    z-index: 20;
+  }
+}
+
 /* MODE SCREEN */
 .mode-choice {
   display: flex;
@@ -175,7 +208,15 @@ body {
   margin-bottom: 12px;
 }
 
-.choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.choice-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.choice-divider {
+  flex: 1 1 100%;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9484bd;
+  margin: 4px 0 -2px;
+}
 .choice-btn {
   flex: 1 1 calc(50% - 8px);
   min-width: 90px;
@@ -311,7 +352,7 @@ body {
   aspect-ratio: 3/4;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #6b4de6, #a04de6);
+  background: linear-gradient(160deg, #4a2f9e 0%, #7b3fd6 55%, #9a4de0 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -319,37 +360,48 @@ body {
   padding: 14px 8px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 0 0 4px rgba(255,255,255,0.06) inset;
+  box-shadow: 0 12px 28px rgba(20,8,50,0.5), 0 0 0 1px rgba(255,255,255,0.08) inset;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.pile:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(20,8,50,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset; }
 .pile:active { transform: scale(0.96); }
 .pile:disabled { opacity: 0.3; cursor: default; }
 .pile-stack {
   position: absolute;
-  inset: 10px;
+  inset: 9px;
   border-radius: 12px;
   background:
-    repeating-conic-gradient(from 45deg, rgba(255,255,255,0.12) 0deg 10deg, transparent 10deg 20deg),
-    linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
-  border: 2px solid rgba(255,255,255,0.35);
+    repeating-conic-gradient(from 45deg, rgba(255,255,255,0.10) 0deg 12deg, transparent 12deg 24deg),
+    repeating-conic-gradient(from 0deg, transparent 0deg 24deg, rgba(255,255,255,0.05) 24deg 25deg),
+    linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02) 60%);
+  border: 2px solid rgba(255,215,150,0.4);
   overflow: hidden;
 }
 .pile-stack::before {
   content: '';
   position: absolute;
-  inset: 8px;
-  border: 1px dashed rgba(255,255,255,0.32);
-  border-radius: 8px;
+  inset: 6px;
+  border: 1px solid rgba(255,215,150,0.28);
+  border-radius: 9px;
 }
 .pile-stack::after {
   content: '?';
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.6rem;
+  font-size: 1.5rem;
   font-weight: 800;
-  color: rgba(255,255,255,0.22);
+  color: rgba(255,215,150,0.85);
+  background: radial-gradient(circle, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 70%);
+  border: 1.5px solid rgba(255,215,150,0.45);
+  box-shadow: 0 0 14px rgba(255,184,77,0.2);
 }
 .pile-label {
   position: relative;

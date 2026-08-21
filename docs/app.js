@@ -35,4 +35,46 @@
 
   document.getElementById('mode-local-btn').addEventListener('click', () => showScreen('screen-setup'));
   document.getElementById('mode-online-btn').addEventListener('click', () => showScreen('screen-online-menu'));
+
+  // Ranking zwyciestw - trwaly, zapisywany lokalnie na tym urzadzeniu/przegladarce.
+  const WINS_KEY = 'gra-karciana-wins';
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+  }
+
+  function loadWins() {
+    try {
+      return JSON.parse(localStorage.getItem(WINS_KEY)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function renderWinsTable() {
+    const wins = loadWins();
+    const entries = Object.entries(wins).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const html = entries.length
+      ? entries.map(([name, count]) => `<tr><td>${escapeHtml(name)}</td><td>${count}</td></tr>`).join('')
+      : '<tr class="empty-row"><td colspan="2">Brak wynikow</td></tr>';
+    document.querySelectorAll('.wins-table-body').forEach((body) => {
+      body.innerHTML = html;
+    });
+  }
+
+  function recordWin(names) {
+    if (!names || !names.length) return;
+    const wins = loadWins();
+    names.forEach((name) => {
+      wins[name] = (wins[name] || 0) + 1;
+    });
+    localStorage.setItem(WINS_KEY, JSON.stringify(wins));
+    renderWinsTable();
+  }
+
+  window.recordWin = recordWin;
+  window.renderWinsTable = renderWinsTable;
+  renderWinsTable();
 })();

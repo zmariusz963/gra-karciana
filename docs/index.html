@@ -12,6 +12,12 @@
   <!-- EKRAN WYBORU TRYBU -->
   <section id="screen-mode" class="screen active">
     <h1 class="title">Ciekawostki<span>Gra karciana</span></h1>
+
+    <div class="wins-panel">
+      <h3>Ranking zwyciestw</h3>
+      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+    </div>
+
     <div class="mode-choice">
       <button id="mode-local-btn" class="mode-card">
         <span class="mode-card-title">Jeden telefon</span>
@@ -43,6 +49,9 @@
         <button class="choice-btn" data-value="ameryka_poludniowa">Ameryka Pd.</button>
         <button class="choice-btn" data-value="afryka">Afryka</button>
         <button class="choice-btn" data-value="australia">Australia</button>
+        <button class="choice-btn" data-value="podroze">Podroze</button>
+        <span class="choice-divider">Inne</span>
+        <button class="choice-btn" data-value="sport">Sport</button>
         <button class="choice-btn" data-value="mix">Mix</button>
       </div>
     </div>
@@ -114,6 +123,12 @@
   <!-- EKRAN KONCOWY -->
   <section id="screen-end" class="screen">
     <h1 class="title">Koniec gry!</h1>
+
+    <div class="wins-panel">
+      <h3>Ranking zwyciestw</h3>
+      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+    </div>
+
     <div id="final-scores" class="final-scores"></div>
     <p id="totals-summary" class="totals-summary"></p>
 
@@ -243,6 +258,12 @@
   <!-- ONLINE: KONIEC GRY -->
   <section id="screen-online-end" class="screen">
     <h1 class="title">Koniec gry!</h1>
+
+    <div class="wins-panel">
+      <h3>Ranking zwyciestw</h3>
+      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+    </div>
+
     <div id="online-final-scores" class="final-scores"></div>
 
     <h2 class="history-heading">Odpowiedzi graczy</h2>
