@@ -61,6 +61,110 @@ body {
   -webkit-text-fill-color: #cabfe0;
   margin-top: 4px;
 }
+.title.small-title {
+  flex: 1;
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+/* MODE SCREEN */
+.mode-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 10px;
+}
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+}
+.mode-card:active { transform: scale(0.98); }
+.mode-card-title { font-size: 1.15rem; font-weight: 800; color: var(--accent); }
+.mode-card-desc { font-size: 0.85rem; color: #cabfe0; line-height: 1.4; }
+
+/* ONLINE MENU */
+.online-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.online-tabs .choice-btn { flex: 1; }
+.online-panel.hidden { display: none; }
+.code-input {
+  text-align: center;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+.online-error {
+  color: var(--bad);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  min-height: 1.3em;
+}
+
+/* LOBBY */
+.room-code-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(255,184,77,0.15), rgba(255,107,107,0.15));
+  border: 2px dashed rgba(255,184,77,0.4);
+  margin-bottom: 24px;
+}
+.room-code-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cabfe0; }
+.room-code-value { font-size: 2.6rem; font-weight: 800; letter-spacing: 0.15em; color: var(--accent); }
+.room-code-hint { font-size: 0.8rem; color: #cabfe0; text-align: center; }
+
+.lobby-players {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lobby-player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  font-weight: 600;
+}
+.lobby-player.me { border: 2px solid var(--accent); }
+.host-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent);
+  color: var(--text-dark);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+#lobby-start-btn.hidden { display: none; }
+#lobby-wait-hint.hidden { display: none; }
+
+.answering-as {
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent2);
+  font-size: 0.9rem;
+  margin: -8px 0 10px;
+}
 
 .setup-block { margin-bottom: 26px; }
 .setup-block h2 {

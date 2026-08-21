@@ -17,11 +17,7 @@
   };
 
   // --- DOM refs ---
-  const screens = {
-    setup: document.getElementById('screen-setup'),
-    game: document.getElementById('screen-game'),
-    end: document.getElementById('screen-end'),
-  };
+  const showScreen = window.showScreen;
   const categoryRow = document.getElementById('category-row');
   const difficultyRow = document.getElementById('difficulty-row');
   const playersCountEl = document.getElementById('players-count');
@@ -47,11 +43,6 @@
   const finalScoresEl = document.getElementById('final-scores');
   const totalsEl = document.getElementById('totals-summary');
   const historyBody = document.getElementById('history-body');
-
-  function showScreen(name) {
-    Object.values(screens).forEach((s) => s.classList.remove('active'));
-    screens[name].classList.add('active');
-  }
 
   // --- Setup screen interactions ---
   categoryRow.addEventListener('click', (e) => {
@@ -104,14 +95,14 @@
 
   startBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', () => {
-    showScreen('setup');
+    showScreen('screen-setup');
   });
 
   document.getElementById('back-btn').addEventListener('click', () => {
     if (!confirm('Wrocic do ustawien? Postep biezacej gry zostanie utracony.')) return;
     stopTimer();
     questionOverlay.classList.add('hidden');
-    showScreen('setup');
+    showScreen('screen-setup');
   });
 
   pileA.addEventListener('click', () => drawCard('a'));
@@ -157,7 +148,7 @@
     }));
     state.currentPlayerIndex = 0;
     state.piles = buildDeck();
-    showScreen('game');
+    showScreen('screen-game');
     renderGameHeader();
     renderPiles();
   }
@@ -321,7 +312,7 @@
     totalsEl.textContent = `Razem: ${totalCorrect} poprawnych, ${totalWrong} blednych`;
 
     renderHistoryTable();
-    showScreen('end');
+    showScreen('screen-end');
   }
 
   function escapeHtml(str) {

@@ -9,9 +9,28 @@
 <body>
 <div id="app">
 
-  <!-- EKRAN USTAWIEN -->
-  <section id="screen-setup" class="screen active">
+  <!-- EKRAN WYBORU TRYBU -->
+  <section id="screen-mode" class="screen active">
     <h1 class="title">Ciekawostki<span>Gra karciana</span></h1>
+    <div class="mode-choice">
+      <button id="mode-local-btn" class="mode-card">
+        <span class="mode-card-title">Jeden telefon</span>
+        <span class="mode-card-desc">Podajecie telefon z reki do reki, kazdy losuje karte na przemian</span>
+      </button>
+      <button id="mode-online-btn" class="mode-card">
+        <span class="mode-card-title">Gra online</span>
+        <span class="mode-card-desc">2-4 graczy, kazdy na swoim telefonie, laczycie sie krotkim kodem pokoju</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- EKRAN USTAWIEN (LOKALNIE) -->
+  <section id="screen-setup" class="screen">
+    <div class="header-top-row">
+      <button class="back-btn" data-back-to="screen-mode" aria-label="Wroc">&#8592;</button>
+      <h1 class="title small-title">Gra na jednym telefonie</h1>
+      <span class="header-spacer"></span>
+    </div>
 
     <div class="setup-block">
       <h2>Kategoria</h2>
@@ -28,7 +47,6 @@
         <button class="choice-btn active" data-value="latwy">Latwy</button>
         <button class="choice-btn" data-value="sredni">Sredni</button>
         <button class="choice-btn" data-value="trudny">Trudny</button>
-        <button class="choice-btn" data-value="mix">Mix</button>
       </div>
     </div>
 
@@ -106,8 +124,138 @@
     <button id="restart-btn" class="primary-btn">Zagraj ponownie</button>
   </section>
 
+  <!-- ONLINE: MENU (STWORZ / DOLACZ) -->
+  <section id="screen-online-menu" class="screen">
+    <div class="header-top-row">
+      <button class="back-btn" data-back-to="screen-mode" aria-label="Wroc">&#8592;</button>
+      <h1 class="title small-title">Gra online</h1>
+      <span class="header-spacer"></span>
+    </div>
+
+    <div class="setup-block">
+      <h2>Twoje imie</h2>
+      <input type="text" id="online-name-input" class="name-input" maxlength="20" placeholder="Twoje imie">
+    </div>
+
+    <div class="online-tabs">
+      <button class="choice-btn active" id="tab-create-btn" data-value="create">Stworz pokoj</button>
+      <button class="choice-btn" id="tab-join-btn" data-value="join">Dolacz do pokoju</button>
+    </div>
+
+    <div id="panel-create" class="online-panel">
+      <div class="setup-block">
+        <h2>Kategoria</h2>
+        <div class="choice-row" id="online-category-row">
+          <button class="choice-btn active" data-value="polska">Polska</button>
+          <button class="choice-btn" data-value="swiat">Swiat</button>
+          <button class="choice-btn" data-value="mix">Mix</button>
+        </div>
+      </div>
+      <div class="setup-block">
+        <h2>Poziom trudnosci</h2>
+        <div class="choice-row" id="online-difficulty-row">
+          <button class="choice-btn active" data-value="latwy">Latwy</button>
+          <button class="choice-btn" data-value="sredni">Sredni</button>
+          <button class="choice-btn" data-value="trudny">Trudny</button>
+        </div>
+      </div>
+      <button id="create-room-btn" class="primary-btn">Stworz pokoj</button>
+    </div>
+
+    <div id="panel-join" class="online-panel hidden">
+      <div class="setup-block">
+        <h2>Kod pokoju</h2>
+        <input type="text" id="join-code-input" class="name-input code-input" maxlength="4" placeholder="np. AB12" autocapitalize="characters">
+      </div>
+      <button id="join-room-btn" class="primary-btn">Dolacz</button>
+    </div>
+
+    <p id="online-error" class="online-error"></p>
+  </section>
+
+  <!-- ONLINE: POCZEKALNIA -->
+  <section id="screen-lobby" class="screen">
+    <div class="header-top-row">
+      <button class="back-btn" id="lobby-back-btn" aria-label="Wroc">&#8592;</button>
+      <h1 class="title small-title">Poczekalnia</h1>
+      <span class="header-spacer"></span>
+    </div>
+
+    <div class="room-code-box">
+      <span class="room-code-label">Kod pokoju</span>
+      <span class="room-code-value" id="room-code-value">----</span>
+      <span class="room-code-hint">Podaj ten kod znajomym, aby dolaczyli</span>
+    </div>
+
+    <div class="setup-block">
+      <h2>Gracze (<span id="lobby-count">1</span>/4)</h2>
+      <div class="lobby-players" id="lobby-players"></div>
+    </div>
+
+    <p class="hint" id="lobby-wait-hint">Czekamy na wiecej graczy (min. 2)...</p>
+    <button id="lobby-start-btn" class="primary-btn hidden">Zaczynamy</button>
+  </section>
+
+  <!-- ONLINE: GRA -->
+  <section id="screen-online-game" class="screen">
+    <div class="game-header">
+      <div class="header-top-row">
+        <button id="online-back-btn" class="back-btn" aria-label="Wyjdz z pokoju">&#8592;</button>
+        <div class="turn-indicator" id="online-turn-indicator">Tura: <span id="online-current-player-name">-</span></div>
+        <span class="header-spacer"></span>
+      </div>
+      <div class="scores" id="online-scores-bar"></div>
+    </div>
+
+    <div class="piles-area" id="online-piles-area">
+      <button class="pile" id="online-pile-a" data-pile="a">
+        <div class="pile-stack"></div>
+        <div class="pile-label">Talia A<br><span id="online-pile-a-count">0</span> kart</div>
+      </button>
+      <button class="pile" id="online-pile-b" data-pile="b">
+        <div class="pile-stack"></div>
+        <div class="pile-label">Talia B<br><span id="online-pile-b-count">0</span> kart</div>
+      </button>
+    </div>
+
+    <p class="hint" id="online-draw-hint">Wybierz talie, aby wylosowac karte</p>
+
+    <div id="online-question-overlay" class="question-overlay hidden">
+      <div class="question-card">
+        <div class="timer-wrap">
+          <div class="timer-bar"><div class="timer-bar-fill" id="online-timer-fill"></div></div>
+          <div class="timer-number" id="online-timer-number">5</div>
+        </div>
+        <p class="answering-as" id="answering-as"></p>
+        <div class="question-text" id="online-question-text">Pytanie</div>
+        <div class="answers-grid" id="online-answers-grid"></div>
+        <div class="feedback" id="online-feedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONLINE: KONIEC GRY -->
+  <section id="screen-online-end" class="screen">
+    <h1 class="title">Koniec gry!</h1>
+    <div id="online-final-scores" class="final-scores"></div>
+
+    <h2 class="history-heading">Odpowiedzi graczy</h2>
+    <div class="history-table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr><th>#</th><th>Gracz</th><th>Pytanie</th><th>Odpowiedz</th><th>Wynik</th></tr>
+        </thead>
+        <tbody id="online-history-body"></tbody>
+      </table>
+    </div>
+
+    <button id="online-restart-btn" class="primary-btn">Wroc do menu</button>
+  </section>
+
 </div>
+<script src="app.js"></script>
 <script src="questions.js"></script>
 <script src="game.js"></script>
+<script src="online.js"></script>
 </body>
 </html>
