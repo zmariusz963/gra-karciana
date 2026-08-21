@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Ciekawostki - Gra karciana</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- EKRAN USTAWIEN -->
+  <section id="screen-setup" class="screen active">
+    <h1 class="title">Ciekawostki<span>Gra karciana</span></h1>
+
+    <div class="setup-block">
+      <h2>Kategoria</h2>
+      <div class="choice-row" id="category-row">
+        <button class="choice-btn active" data-value="polska">Polska</button>
+        <button class="choice-btn" data-value="swiat">Swiat</button>
+        <button class="choice-btn" data-value="mix">Mix</button>
+      </div>
+    </div>
+
+    <div class="setup-block">
+      <h2>Poziom trudnosci</h2>
+      <div class="choice-row" id="difficulty-row">
+        <button class="choice-btn active" data-value="latwy">Latwy</button>
+        <button class="choice-btn" data-value="sredni">Sredni</button>
+        <button class="choice-btn" data-value="trudny">Trudny</button>
+        <button class="choice-btn" data-value="mix">Mix</button>
+      </div>
+    </div>
+
+    <div class="setup-block">
+      <h2>Liczba graczy</h2>
+      <div class="stepper">
+        <button id="players-minus" class="stepper-btn">-</button>
+        <span id="players-count">2</span>
+        <button id="players-plus" class="stepper-btn">+</button>
+      </div>
+    </div>
+
+    <div class="setup-block">
+      <h2>Imiona graczy</h2>
+      <div class="names-list" id="names-list"></div>
+    </div>
+
+    <button id="start-btn" class="primary-btn">Zaczynamy</button>
+  </section>
+
+  <!-- EKRAN GRY -->
+  <section id="screen-game" class="screen">
+    <div class="game-header">
+      <div class="header-top-row">
+        <button id="back-btn" class="back-btn" aria-label="Cofnij do ustawien">&#8592;</button>
+        <div class="turn-indicator">Tura: <span id="current-player-name">Gracz 1</span></div>
+        <span class="header-spacer"></span>
+      </div>
+      <div class="scores" id="scores-bar"></div>
+    </div>
+
+    <div class="piles-area" id="piles-area">
+      <button class="pile" id="pile-a" data-pile="a">
+        <div class="pile-stack"></div>
+        <div class="pile-label">Talia A<br><span id="pile-a-count">0</span> kart</div>
+      </button>
+      <button class="pile" id="pile-b" data-pile="b">
+        <div class="pile-stack"></div>
+        <div class="pile-label">Talia B<br><span id="pile-b-count">0</span> kart</div>
+      </button>
+    </div>
+
+    <p class="hint" id="draw-hint">Wybierz talie, aby wylosowac karte</p>
+
+    <!-- KARTA Z PYTANIEM -->
+    <div id="question-overlay" class="question-overlay hidden">
+      <div class="question-card">
+        <div class="timer-wrap">
+          <div class="timer-bar"><div class="timer-bar-fill" id="timer-fill"></div></div>
+          <div class="timer-number" id="timer-number">5</div>
+        </div>
+        <div class="question-text" id="question-text">Pytanie</div>
+        <div class="answers-grid" id="answers-grid"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EKRAN KONCOWY -->
+  <section id="screen-end" class="screen">
+    <h1 class="title">Koniec gry!</h1>
+    <div id="final-scores" class="final-scores"></div>
+    <p id="totals-summary" class="totals-summary"></p>
+
+    <h2 class="history-heading">Odpowiedzi graczy</h2>
+    <div class="history-table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr><th>#</th><th>Gracz</th><th>Pytanie</th><th>Odpowiedz</th><th>Wynik</th></tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+
+    <button id="restart-btn" class="primary-btn">Zagraj ponownie</button>
+  </section>
+
+</div>
+<script src="questions.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

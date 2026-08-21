@@ -1,0 +1,9 @@
+{
+  "name": "gra-karciana",
+  "version": "1.0.0",
+  "description": "Gra karciana z pytaniami o Polsce i swiecie - tryb lokalny, dedykowana na telefony",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
