@@ -6,7 +6,7 @@ const { QUESTIONS, shuffleOptions } = require('./public/questions.js');
 
 const PORT = process.env.PORT || 3002;
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const ANSWER_TIME_MS = 5000;
+const ANSWER_TIME_MS = 15000;
 const MAX_PLAYERS = 4;
 
 const MIME = {
@@ -57,24 +57,28 @@ function shuffle(arr) {
 }
 
 function collectQuestions(category, difficulty) {
-  const categories = category === 'mix' ? Object.keys(QUESTIONS) : [category];
+  // "losowa" losuje kategorie osobno dla kazdego pytania, wiec zmienia sie co kolejke.
+  const categories = category === 'mix' || category === 'losowa' ? Object.keys(QUESTIONS) : [category];
   const difficulties = difficulty === 'mix' ? ['latwy', 'sredni', 'trudny'] : [difficulty];
   let pool = [];
   categories.forEach((c) => {
     difficulties.forEach((d) => {
-      pool = pool.concat(QUESTIONS[c][d]);
+      pool = pool.concat(QUESTIONS[c][d].map((q) => ({ ...q, sourceCategory: c })));
     });
   });
   return pool;
 }
 
-function buildDeck(category, difficulty) {
+function buildPile(category, difficulty) {
   const pool = collectQuestions(category, difficulty);
-  const shuffled = shuffle(pool).map(shuffleOptions);
-  const a = [];
-  const b = [];
-  shuffled.forEach((q, i) => (i % 2 === 0 ? a : b).push(q));
-  return { a, b };
+  return shuffle(pool).map(shuffleOptions);
+}
+
+function buildDeck(categoryA, categoryB, difficulty) {
+  return {
+    a: buildPile(categoryA, difficulty),
+    b: buildPile(categoryB, difficulty),
+  };
 }
 
 function send(ws, msg) {
@@ -97,6 +101,8 @@ function roomStatePayload(room) {
     pileCounts: { a: room.piles.a.length, b: room.piles.b.length },
     started: room.started,
     hostId: room.players[0] ? room.players[0].id : null,
+    categoryA: room.categoryA,
+    categoryB: room.categoryB,
   };
 }
 
@@ -164,7 +170,8 @@ wss.on('connection', (ws) => {
       const room = {
         code,
         players: [],
-        category: msg.category || 'polska',
+        categoryA: msg.categoryA || 'polska',
+        categoryB: msg.categoryB || 'swiat',
         difficulty: msg.difficulty || 'latwy',
         piles: { a: [], b: [] },
         currentIndex: 0,
@@ -216,7 +223,7 @@ wss.on('connection', (ws) => {
       }
       if (!room.players[0] || room.players[0].id !== ws.id) return;
       room.started = true;
-      room.piles = buildDeck(room.category, room.difficulty);
+      room.piles = buildDeck(room.categoryA, room.categoryB, room.difficulty);
       room.currentIndex = 0;
       broadcast(room, { type: 'game_start', state: roomStatePayload(room) });
       return;
@@ -235,7 +242,8 @@ wss.on('connection', (ws) => {
       const deadline = Date.now() + ANSWER_TIME_MS;
       broadcast(room, {
         type: 'question',
-        question: { q: q.q, options: q.options },
+        pile: pileKey,
+        question: { q: q.q, options: q.options, sourceCategory: q.sourceCategory },
         pileCounts: { a: room.piles.a.length, b: room.piles.b.length },
         deadline,
         currentPlayerId: current.id,

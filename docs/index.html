@@ -15,7 +15,10 @@
 
     <div class="wins-panel">
       <h3>Ranking zwyciestw</h3>
-      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+      <table class="wins-table">
+        <thead><tr><th>Gracz</th><th>W</th><th>P</th><th>Pkt</th></tr></thead>
+        <tbody class="wins-table-body"></tbody>
+      </table>
     </div>
 
     <div class="mode-choice">
@@ -38,22 +41,44 @@
       <span class="header-spacer"></span>
     </div>
 
+    <button id="random-game-btn" type="button" class="random-btn">🎲 Gra losowa</button>
+
     <div class="setup-block">
-      <h2>Kategoria</h2>
-      <div class="choice-row" id="category-row">
-        <button class="choice-btn active" data-value="polska">Polska</button>
-        <button class="choice-btn" data-value="swiat">Swiat</button>
-        <button class="choice-btn" data-value="europa">Europa</button>
-        <button class="choice-btn" data-value="azja">Azja</button>
-        <button class="choice-btn" data-value="ameryka_polnocna">Ameryka Pn.</button>
-        <button class="choice-btn" data-value="ameryka_poludniowa">Ameryka Pd.</button>
-        <button class="choice-btn" data-value="afryka">Afryka</button>
-        <button class="choice-btn" data-value="australia">Australia</button>
-        <button class="choice-btn" data-value="podroze">Podroze</button>
-        <span class="choice-divider">Inne</span>
-        <button class="choice-btn" data-value="sport">Sport</button>
-        <button class="choice-btn" data-value="mix">Mix</button>
-      </div>
+      <h2>Kategoria - Talia A</h2>
+      <select id="category-a-select" class="select-input">
+        <option value="polska" selected>Polska</option>
+        <option value="swiat">Swiat</option>
+        <option value="europa">Europa</option>
+        <option value="azja">Azja</option>
+        <option value="ameryka_polnocna">Ameryka Polnocna</option>
+        <option value="ameryka_poludniowa">Ameryka Poludniowa</option>
+        <option value="afryka">Afryka</option>
+        <option value="australia">Australia</option>
+        <option value="podroze">Podroze</option>
+        <option value="sport">Sport</option>
+        <option value="wiedza_ogolna">Wiedza ogolna</option>
+        <option value="mix">Mix (wszystkie)</option>
+        <option value="losowa">Losowo (niespodzianka)</option>
+      </select>
+    </div>
+
+    <div class="setup-block">
+      <h2>Kategoria - Talia B</h2>
+      <select id="category-b-select" class="select-input">
+        <option value="polska">Polska</option>
+        <option value="swiat" selected>Swiat</option>
+        <option value="europa">Europa</option>
+        <option value="azja">Azja</option>
+        <option value="ameryka_polnocna">Ameryka Polnocna</option>
+        <option value="ameryka_poludniowa">Ameryka Poludniowa</option>
+        <option value="afryka">Afryka</option>
+        <option value="australia">Australia</option>
+        <option value="podroze">Podroze</option>
+        <option value="sport">Sport</option>
+        <option value="wiedza_ogolna">Wiedza ogolna</option>
+        <option value="mix">Mix (wszystkie)</option>
+        <option value="losowa">Losowo (niespodzianka)</option>
+      </select>
     </div>
 
     <div class="setup-block">
@@ -90,17 +115,20 @@
         <div class="turn-indicator">Tura: <span id="current-player-name">Gracz 1</span></div>
         <span class="header-spacer"></span>
       </div>
-      <div class="scores" id="scores-bar"></div>
+      <table class="live-scores-table">
+        <thead><tr><th>Gracz</th><th>✓</th><th>✗</th></tr></thead>
+        <tbody id="scores-bar"></tbody>
+      </table>
     </div>
 
     <div class="piles-area" id="piles-area">
       <button class="pile" id="pile-a" data-pile="a">
         <div class="pile-stack"></div>
-        <div class="pile-label">Talia A<br><span id="pile-a-count">0</span> kart</div>
+        <div class="pile-label"><span id="pile-a-cat">Talia A</span><br><span id="pile-a-count">0</span> kart</div>
       </button>
       <button class="pile" id="pile-b" data-pile="b">
         <div class="pile-stack"></div>
-        <div class="pile-label">Talia B<br><span id="pile-b-count">0</span> kart</div>
+        <div class="pile-label"><span id="pile-b-cat">Talia B</span><br><span id="pile-b-count">0</span> kart</div>
       </button>
     </div>
 
@@ -113,6 +141,7 @@
           <div class="timer-bar"><div class="timer-bar-fill" id="timer-fill"></div></div>
           <div class="timer-number" id="timer-number">5</div>
         </div>
+        <p class="question-category" id="question-category">Kategoria</p>
         <div class="question-text" id="question-text">Pytanie</div>
         <div class="answers-grid" id="answers-grid"></div>
         <div class="feedback" id="feedback"></div>
@@ -126,7 +155,10 @@
 
     <div class="wins-panel">
       <h3>Ranking zwyciestw</h3>
-      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+      <table class="wins-table">
+        <thead><tr><th>Gracz</th><th>W</th><th>P</th><th>Pkt</th></tr></thead>
+        <tbody class="wins-table-body"></tbody>
+      </table>
     </div>
 
     <div id="final-scores" class="final-scores"></div>
@@ -159,27 +191,48 @@
     </div>
 
     <div class="online-tabs">
-      <button class="choice-btn active" id="tab-create-btn" data-value="create">Stworz pokoj</button>
+      <button class="choice-btn active" id="tab-create-btn" data-value="create">Nowy pokoj</button>
       <button class="choice-btn" id="tab-join-btn" data-value="join">Dolacz do pokoju</button>
     </div>
 
     <div id="panel-create" class="online-panel">
+      <button id="online-random-game-btn" type="button" class="random-btn">🎲 Gra losowa</button>
+
       <div class="setup-block">
-        <h2>Kategoria</h2>
-        <div class="choice-row" id="online-category-row">
-          <button class="choice-btn active" data-value="polska">Polska</button>
-          <button class="choice-btn" data-value="swiat">Swiat</button>
-          <button class="choice-btn" data-value="europa">Europa</button>
-          <button class="choice-btn" data-value="azja">Azja</button>
-          <button class="choice-btn" data-value="ameryka_polnocna">Ameryka Pn.</button>
-          <button class="choice-btn" data-value="ameryka_poludniowa">Ameryka Pd.</button>
-          <button class="choice-btn" data-value="afryka">Afryka</button>
-          <button class="choice-btn" data-value="australia">Australia</button>
-          <button class="choice-btn" data-value="podroze">Podroze</button>
-          <span class="choice-divider">Inne</span>
-          <button class="choice-btn" data-value="sport">Sport</button>
-          <button class="choice-btn" data-value="mix">Mix</button>
-        </div>
+        <h2>Kategoria - Talia A</h2>
+        <select id="online-category-a-select" class="select-input">
+          <option value="polska" selected>Polska</option>
+          <option value="swiat">Swiat</option>
+          <option value="europa">Europa</option>
+          <option value="azja">Azja</option>
+          <option value="ameryka_polnocna">Ameryka Polnocna</option>
+          <option value="ameryka_poludniowa">Ameryka Poludniowa</option>
+          <option value="afryka">Afryka</option>
+          <option value="australia">Australia</option>
+          <option value="podroze">Podroze</option>
+          <option value="sport">Sport</option>
+          <option value="wiedza_ogolna">Wiedza ogolna</option>
+          <option value="mix">Mix (wszystkie)</option>
+          <option value="losowa">Losowo (niespodzianka)</option>
+        </select>
+      </div>
+      <div class="setup-block">
+        <h2>Kategoria - Talia B</h2>
+        <select id="online-category-b-select" class="select-input">
+          <option value="polska">Polska</option>
+          <option value="swiat" selected>Swiat</option>
+          <option value="europa">Europa</option>
+          <option value="azja">Azja</option>
+          <option value="ameryka_polnocna">Ameryka Polnocna</option>
+          <option value="ameryka_poludniowa">Ameryka Poludniowa</option>
+          <option value="afryka">Afryka</option>
+          <option value="australia">Australia</option>
+          <option value="podroze">Podroze</option>
+          <option value="sport">Sport</option>
+          <option value="wiedza_ogolna">Wiedza ogolna</option>
+          <option value="mix">Mix (wszystkie)</option>
+          <option value="losowa">Losowo (niespodzianka)</option>
+        </select>
       </div>
       <div class="setup-block">
         <h2>Poziom trudnosci</h2>
@@ -234,17 +287,20 @@
         <div class="turn-indicator" id="online-turn-indicator">Tura: <span id="online-current-player-name">-</span></div>
         <span class="header-spacer"></span>
       </div>
-      <div class="scores" id="online-scores-bar"></div>
+      <table class="live-scores-table">
+        <thead><tr><th>Gracz</th><th>✓</th><th>✗</th></tr></thead>
+        <tbody id="online-scores-bar"></tbody>
+      </table>
     </div>
 
     <div class="piles-area" id="online-piles-area">
       <button class="pile" id="online-pile-a" data-pile="a">
         <div class="pile-stack"></div>
-        <div class="pile-label">Talia A<br><span id="online-pile-a-count">0</span> kart</div>
+        <div class="pile-label"><span id="online-pile-a-cat">Talia A</span><br><span id="online-pile-a-count">0</span> kart</div>
       </button>
       <button class="pile" id="online-pile-b" data-pile="b">
         <div class="pile-stack"></div>
-        <div class="pile-label">Talia B<br><span id="online-pile-b-count">0</span> kart</div>
+        <div class="pile-label"><span id="online-pile-b-cat">Talia B</span><br><span id="online-pile-b-count">0</span> kart</div>
       </button>
     </div>
 
@@ -257,6 +313,7 @@
           <div class="timer-number" id="online-timer-number">5</div>
         </div>
         <p class="answering-as" id="answering-as"></p>
+        <p class="question-category" id="online-question-category">Kategoria</p>
         <div class="question-text" id="online-question-text">Pytanie</div>
         <div class="answers-grid" id="online-answers-grid"></div>
         <div class="feedback" id="online-feedback"></div>
@@ -270,7 +327,10 @@
 
     <div class="wins-panel">
       <h3>Ranking zwyciestw</h3>
-      <table class="wins-table"><tbody class="wins-table-body"></tbody></table>
+      <table class="wins-table">
+        <thead><tr><th>Gracz</th><th>W</th><th>P</th><th>Pkt</th></tr></thead>
+        <tbody class="wins-table-body"></tbody>
+      </table>
     </div>
 
     <div id="online-final-scores" class="final-scores"></div>

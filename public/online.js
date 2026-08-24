@@ -5,7 +5,8 @@
     ws: null,
     myId: null,
     myName: '',
-    category: 'polska',
+    categoryA: 'polska',
+    categoryB: 'swiat',
     difficulty: 'latwy',
     players: [],
     currentPlayerId: null,
@@ -14,6 +15,7 @@
     answered: false,
     timerInterval: null,
     history: [],
+    liveStats: {},
   };
 
   // --- DOM refs ---
@@ -22,7 +24,8 @@
   const tabJoinBtn = document.getElementById('tab-join-btn');
   const panelCreate = document.getElementById('panel-create');
   const panelJoin = document.getElementById('panel-join');
-  const categoryRow = document.getElementById('online-category-row');
+  const categoryASelect = document.getElementById('online-category-a-select');
+  const categoryBSelect = document.getElementById('online-category-b-select');
   const difficultyRow = document.getElementById('online-difficulty-row');
   const createRoomBtn = document.getElementById('create-room-btn');
   const joinCodeInput = document.getElementById('join-code-input');
@@ -43,11 +46,14 @@
   const pileB = document.getElementById('online-pile-b');
   const pileACount = document.getElementById('online-pile-a-count');
   const pileBCount = document.getElementById('online-pile-b-count');
+  const pileACat = document.getElementById('online-pile-a-cat');
+  const pileBCat = document.getElementById('online-pile-b-cat');
   const drawHint = document.getElementById('online-draw-hint');
   const onlineBackBtn = document.getElementById('online-back-btn');
 
   const questionOverlay = document.getElementById('online-question-overlay');
   const answeringAs = document.getElementById('answering-as');
+  const questionCategoryEl = document.getElementById('online-question-category');
   const questionText = document.getElementById('online-question-text');
   const answersGrid = document.getElementById('online-answers-grid');
   const timerFill = document.getElementById('online-timer-fill');
@@ -84,13 +90,21 @@
     showError('');
   });
 
-  categoryRow.addEventListener('click', (e) => {
-    const btn = e.target.closest('.choice-btn');
-    if (!btn) return;
-    categoryRow.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.category = btn.dataset.value;
+  categoryASelect.addEventListener('change', () => {
+    state.categoryA = categoryASelect.value;
   });
+  categoryBSelect.addEventListener('change', () => {
+    state.categoryB = categoryBSelect.value;
+  });
+
+  document.getElementById('online-random-game-btn').addEventListener('click', () => {
+    categoryASelect.value = 'losowa';
+    categoryBSelect.value = 'losowa';
+    state.categoryA = 'losowa';
+    state.categoryB = 'losowa';
+    createRoomBtn.click();
+  });
+
   difficultyRow.addEventListener('click', (e) => {
     const btn = e.target.closest('.choice-btn');
     if (!btn) return;
@@ -143,7 +157,7 @@
     }
     showError('');
     connect(() => {
-      send({ type: 'create', name: state.myName, category: state.category, difficulty: state.difficulty });
+      send({ type: 'create', name: state.myName, categoryA: state.categoryA, categoryB: state.categoryB, difficulty: state.difficulty });
     });
   });
 
@@ -180,7 +194,10 @@
         renderLobby();
         break;
       case 'game_start':
+        state.liveStats = {};
         applyRoomState(msg.state);
+        pileACat.textContent = window.CATEGORY_LABELS[msg.state.categoryA] || 'Talia A';
+        pileBCat.textContent = window.CATEGORY_LABELS[msg.state.categoryB] || 'Talia B';
         questionOverlay.classList.add('hidden');
         showScreen('screen-online-game');
         renderGameHeader();
@@ -276,9 +293,7 @@
   function renderGameHeader() {
     const current = state.players.find((p) => p.id === state.currentPlayerId);
     currentPlayerNameEl.textContent = current ? current.name + (current.id === state.myId ? ' (Ty)' : '') : '-';
-    scoresBar.innerHTML = state.players
-      .map((p) => `<span class="score-chip${p.id === state.currentPlayerId ? ' current' : ''}">${escapeHtml(p.name)}: ${p.score}</span>`)
-      .join('');
+    renderScoresTable();
     const myTurn = state.currentPlayerId === state.myId;
     drawHint.textContent = myTurn ? 'Twoja tura - wybierz talie' : 'Czekaj na swoja ture...';
   }
@@ -295,6 +310,9 @@
   function showQuestion(msg) {
     state.answered = false;
     state.activeCorrectIdx = null;
+    const catLabel = window.CATEGORY_LABELS[msg.question.sourceCategory] || '';
+    if (msg.pile === 'b') pileBCat.textContent = catLabel;
+    else pileACat.textContent = catLabel;
     pileACount.textContent = msg.pileCounts.a;
     pileBCount.textContent = msg.pileCounts.b;
     pileA.disabled = true;
@@ -304,6 +322,7 @@
     const myTurn = msg.currentPlayerId === state.myId;
     answeringAs.textContent = myTurn ? 'Twoja kolej na odpowiedz!' : `Odpowiada: ${asker ? asker.name : '...'}`;
 
+    questionCategoryEl.textContent = window.CATEGORY_LABELS[msg.question.sourceCategory] || '';
     questionText.textContent = msg.question.q;
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
@@ -351,7 +370,7 @@
     timerFill.style.transition = 'transform 0.1s linear';
     state.timerInterval = setInterval(tick, 100);
   }
-  const ANSWER_TIME_MS_CLIENT = 5000;
+  const ANSWER_TIME_MS_CLIENT = 15000;
 
   function handleAnswerResult(msg) {
     clearInterval(state.timerInterval);
@@ -364,6 +383,12 @@
     });
     const responder = state.players.find((p) => p.id === msg.playerId);
     const isMe = msg.playerId === state.myId;
+    if (msg.playerId) {
+      const stats = state.liveStats[msg.playerId] || { correct: 0, wrong: 0 };
+      if (msg.correct) stats.correct += 1;
+      else stats.wrong += 1;
+      state.liveStats[msg.playerId] = stats;
+    }
     if (msg.chosenIdx === null) {
       feedbackEl.textContent = isMe ? 'Czas minal!' : `${responder ? responder.name : 'Gracz'}: czas minal!`;
       feedbackEl.classList.add('bad');
@@ -374,19 +399,22 @@
       feedbackEl.textContent = isMe ? 'Zla odpowiedz!' : `${responder ? responder.name : 'Gracz'}: zla odpowiedz!`;
       feedbackEl.classList.add('bad');
     }
+    renderScoresTable();
+  }
+
+  function renderScoresTable() {
     scoresBar.innerHTML = state.players
-      .map((p) => `<span class="score-chip${p.id === state.currentPlayerId ? ' current' : ''}">${escapeHtml(p.name)}: ${p.score}</span>`)
+      .map((p) => {
+        const stats = state.liveStats[p.id] || { correct: 0, wrong: 0 };
+        return `<tr class="${p.id === state.currentPlayerId ? 'current' : ''}"><td>${escapeHtml(p.name)}${p.id === state.myId ? ' (Ty)' : ''}</td><td>${stats.correct}</td><td>${stats.wrong}</td></tr>`;
+      })
       .join('');
   }
 
   function renderEnd() {
     const sorted = [...state.players].sort((a, b) => b.score - a.score);
     const topScore = sorted[0] ? sorted[0].score : 0;
-    if (topScore > 0) {
-      window.recordWin(sorted.filter((p) => p.score === topScore).map((p) => p.name));
-    } else {
-      window.renderWinsTable();
-    }
+    if (sorted.length) window.recordGameResult(sorted.map((p) => ({ name: p.name, score: p.score })));
     finalScoresEl.innerHTML = sorted
       .map((p) => {
         const entries = state.history.filter((h) => h.player === p.name);

@@ -7,6 +7,23 @@
   }
   window.showScreen = showScreen;
 
+  // Nazwy kategorii do wyswietlania (np. na etykietach talii).
+  window.CATEGORY_LABELS = {
+    polska: 'Polska',
+    swiat: 'Swiat',
+    europa: 'Europa',
+    azja: 'Azja',
+    ameryka_polnocna: 'Ameryka Pn.',
+    ameryka_poludniowa: 'Ameryka Pd.',
+    afryka: 'Afryka',
+    australia: 'Australia',
+    podroze: 'Podroze',
+    sport: 'Sport',
+    wiedza_ogolna: 'Wiedza ogolna',
+    mix: 'Mix',
+    losowa: 'Losowo',
+  };
+
   // Sygnal dzwiekowy + wibracja, gdy zostaje ostatnia sekunda na odpowiedz.
   function beepAndVibrate() {
     try {
@@ -36,8 +53,8 @@
   document.getElementById('mode-local-btn').addEventListener('click', () => showScreen('screen-setup'));
   document.getElementById('mode-online-btn').addEventListener('click', () => showScreen('screen-online-menu'));
 
-  // Ranking zwyciestw - trwaly, zapisywany lokalnie na tym urzadzeniu/przegladarce.
-  const WINS_KEY = 'gra-karciana-wins';
+  // Ranking zwyciestw i punktow - trwaly, zapisywany lokalnie na tym urzadzeniu/przegladarce.
+  const STATS_KEY = 'gra-karciana-stats';
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (c) => ({
@@ -45,36 +62,46 @@
     }[c]));
   }
 
-  function loadWins() {
+  function loadStats() {
     try {
-      return JSON.parse(localStorage.getItem(WINS_KEY)) || {};
+      return JSON.parse(localStorage.getItem(STATS_KEY)) || {};
     } catch {
       return {};
     }
   }
 
   function renderWinsTable() {
-    const wins = loadWins();
-    const entries = Object.entries(wins).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const stats = loadStats();
+    const entries = Object.entries(stats)
+      .sort((a, b) => (b[1].points || 0) - (a[1].points || 0))
+      .slice(0, 8);
     const html = entries.length
-      ? entries.map(([name, count]) => `<tr><td>${escapeHtml(name)}</td><td>${count}</td></tr>`).join('')
-      : '<tr class="empty-row"><td colspan="2">Brak wynikow</td></tr>';
+      ? entries.map(([name, s]) => `<tr><td>${escapeHtml(name)}</td><td>${s.wins || 0}</td><td>${s.losses || 0}</td><td>${s.points || 0}</td></tr>`).join('')
+      : '<tr class="empty-row"><td colspan="4">Brak wynikow</td></tr>';
     document.querySelectorAll('.wins-table-body').forEach((body) => {
       body.innerHTML = html;
     });
   }
 
-  function recordWin(names) {
-    if (!names || !names.length) return;
-    const wins = loadWins();
-    names.forEach((name) => {
-      wins[name] = (wins[name] || 0) + 1;
+  // players: [{name, score}] - wszyscy gracze z zakonczonej gry (nie tylko zwyciezcy).
+  function recordGameResult(players) {
+    if (!players || !players.length) return;
+    const stats = loadStats();
+    const topScore = Math.max(...players.map((p) => p.score));
+    players.forEach((p) => {
+      const entry = stats[p.name] || { wins: 0, losses: 0, points: 0 };
+      entry.points += p.score;
+      if (topScore > 0) {
+        if (p.score === topScore) entry.wins += 1;
+        else entry.losses += 1;
+      }
+      stats[p.name] = entry;
     });
-    localStorage.setItem(WINS_KEY, JSON.stringify(wins));
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
     renderWinsTable();
   }
 
-  window.recordWin = recordWin;
+  window.recordGameResult = recordGameResult;
   window.renderWinsTable = renderWinsTable;
   renderWinsTable();
 })();

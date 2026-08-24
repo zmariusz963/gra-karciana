@@ -1,8 +1,9 @@
 (function () {
-  const ANSWER_TIME_MS = 5000;
+  const ANSWER_TIME_MS = 15000;
 
   const state = {
-    category: 'polska',
+    categoryA: 'polska',
+    categoryB: 'swiat',
     difficulty: 'latwy',
     playerCount: 2,
     playerNames: [],
@@ -18,7 +19,8 @@
 
   // --- DOM refs ---
   const showScreen = window.showScreen;
-  const categoryRow = document.getElementById('category-row');
+  const categoryASelect = document.getElementById('category-a-select');
+  const categoryBSelect = document.getElementById('category-b-select');
   const difficultyRow = document.getElementById('difficulty-row');
   const playersCountEl = document.getElementById('players-count');
   const namesList = document.getElementById('names-list');
@@ -31,9 +33,12 @@
   const pileB = document.getElementById('pile-b');
   const pileACount = document.getElementById('pile-a-count');
   const pileBCount = document.getElementById('pile-b-count');
+  const pileACat = document.getElementById('pile-a-cat');
+  const pileBCat = document.getElementById('pile-b-cat');
   const drawHint = document.getElementById('draw-hint');
 
   const questionOverlay = document.getElementById('question-overlay');
+  const questionCategoryEl = document.getElementById('question-category');
   const questionText = document.getElementById('question-text');
   const answersGrid = document.getElementById('answers-grid');
   const timerFill = document.getElementById('timer-fill');
@@ -45,12 +50,19 @@
   const historyBody = document.getElementById('history-body');
 
   // --- Setup screen interactions ---
-  categoryRow.addEventListener('click', (e) => {
-    const btn = e.target.closest('.choice-btn');
-    if (!btn) return;
-    categoryRow.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.category = btn.dataset.value;
+  categoryASelect.addEventListener('change', () => {
+    state.categoryA = categoryASelect.value;
+  });
+  categoryBSelect.addEventListener('change', () => {
+    state.categoryB = categoryBSelect.value;
+  });
+
+  document.getElementById('random-game-btn').addEventListener('click', () => {
+    categoryASelect.value = 'losowa';
+    categoryBSelect.value = 'losowa';
+    state.categoryA = 'losowa';
+    state.categoryB = 'losowa';
+    startGame();
   });
 
   difficultyRow.addEventListener('click', (e) => {
@@ -119,24 +131,28 @@
   }
 
   function collectQuestions(category, difficulty) {
-    const categories = category === 'mix' ? Object.keys(QUESTIONS) : [category];
+    // "losowa" losuje kategorie osobno dla kazdego pytania, wiec zmienia sie co kolejke.
+    const categories = category === 'mix' || category === 'losowa' ? Object.keys(QUESTIONS) : [category];
     const difficulties = difficulty === 'mix' ? ['latwy', 'sredni', 'trudny'] : [difficulty];
     let pool = [];
     categories.forEach((c) => {
       difficulties.forEach((d) => {
-        pool = pool.concat(QUESTIONS[c][d]);
+        pool = pool.concat(QUESTIONS[c][d].map((q) => ({ ...q, sourceCategory: c })));
       });
     });
     return pool;
   }
 
+  function buildPile(category, difficulty) {
+    const pool = collectQuestions(category, difficulty);
+    return shuffle(pool).map(shuffleOptions);
+  }
+
   function buildDeck() {
-    const pool = collectQuestions(state.category, state.difficulty);
-    const shuffled = shuffle(pool).map(shuffleOptions);
-    const pileA = [];
-    const pileB = [];
-    shuffled.forEach((q, i) => (i % 2 === 0 ? pileA : pileB).push(q));
-    return { a: pileA, b: pileB };
+    return {
+      a: buildPile(state.categoryA, state.difficulty),
+      b: buildPile(state.categoryB, state.difficulty),
+    };
   }
 
   // --- Game flow ---
@@ -148,6 +164,8 @@
     }));
     state.currentPlayerIndex = 0;
     state.piles = buildDeck();
+    pileACat.textContent = window.CATEGORY_LABELS[state.categoryA] || 'Losowo';
+    pileBCat.textContent = window.CATEGORY_LABELS[state.categoryB] || 'Losowo';
     showScreen('screen-game');
     renderGameHeader();
     renderPiles();
@@ -157,10 +175,11 @@
     const current = state.players[state.currentPlayerIndex];
     currentPlayerNameEl.textContent = current.name;
     scoresBar.innerHTML = state.players
-      .map(
-        (p, i) =>
-          `<span class="score-chip${i === state.currentPlayerIndex ? ' current' : ''}">${p.name}: ${p.score}</span>`
-      )
+      .map((p, i) => {
+        const correct = p.history.filter((h) => h.isCorrect).length;
+        const wrong = p.history.length - correct;
+        return `<tr class="${i === state.currentPlayerIndex ? 'current' : ''}"><td>${escapeHtml(p.name)}</td><td>${correct}</td><td>${wrong}</td></tr>`;
+      })
       .join('');
   }
 
@@ -180,12 +199,16 @@
     const question = state.piles[pileKey].pop();
     state.activeQuestion = question;
     state.activePile = pileKey;
+    const catLabel = window.CATEGORY_LABELS[question.sourceCategory] || '';
+    if (pileKey === 'a') pileACat.textContent = catLabel;
+    else pileBCat.textContent = catLabel;
     renderPiles();
     showQuestion(question);
   }
 
   function showQuestion(question) {
     state.answered = false;
+    questionCategoryEl.textContent = window.CATEGORY_LABELS[question.sourceCategory] || '';
     questionText.textContent = question.q;
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
@@ -297,11 +320,7 @@
     questionOverlay.classList.add('hidden');
     const sorted = [...state.players].sort((a, b) => b.score - a.score);
     const topScore = sorted[0].score;
-    if (topScore > 0) {
-      window.recordWin(sorted.filter((p) => p.score === topScore).map((p) => p.name));
-    } else {
-      window.renderWinsTable();
-    }
+    window.recordGameResult(sorted.map((p) => ({ name: p.name, score: p.score })));
     finalScoresEl.innerHTML = sorted
       .map((p) => {
         const correct = p.history.filter((h) => h.isCorrect).length;

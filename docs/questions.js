@@ -364,6 +364,38 @@ const QUESTIONS = {
       { q: 'Jak nazywa sie jeden z najdluzszych mostow swiata, znajdujacy sie w Chinach (most Danyang-Kunshan)?', options: ['Most Danyang-Kunshan', 'Golden Gate Bridge', 'Most Akashi Kaikyo', 'Most Vasco da Gama'], correct: 0 },
     ],
   },
+  wiedza_ogolna: {
+    latwy: [
+      { q: 'Ile dni ma rok przestepny?', options: ['366', '365', '364', '367'], correct: 0 },
+      { q: 'Jaki jest chemiczny wzor wody?', options: ['H2O', 'CO2', 'O2', 'NaCl'], correct: 0 },
+      { q: 'Ile nog ma pajak?', options: ['8', '6', '10', '4'], correct: 0 },
+      { q: 'Jaki jest najwiekszy organ ciala czlowieka?', options: ['Skora', 'Watroba', 'Mozg', 'Serce'], correct: 0 },
+      { q: 'Ile kolorow ma teczka w klasycznym podziale?', options: ['7', '5', '6', '8'], correct: 0 },
+      { q: 'Jaki gaz jest niezbedny czlowiekowi do oddychania?', options: ['Tlen', 'Azot', 'Dwutlenek wegla', 'Wodor'], correct: 0 },
+      { q: 'Ile miesiecy ma rok?', options: ['12', '10', '11', '13'], correct: 0 },
+      { q: 'Jak nazywa sie naturalny satelita Ziemi?', options: ['Ksiezyc', 'Mars', 'Slonce', 'Wenus'], correct: 0 },
+    ],
+    sredni: [
+      { q: 'Kto sformulowal teorie ewolucji poprzez dobor naturalny?', options: ['Karol Darwin', 'Gregor Mendel', 'Louis Pasteur', 'Isaac Newton'], correct: 0 },
+      { q: 'Jaki jest najtwardszy naturalny material na Ziemi?', options: ['Diament', 'Stal', 'Kwarc', 'Granit'], correct: 0 },
+      { q: 'Ile kosci ma dorosly czlowiek?', options: ['206', '300', '150', '250'], correct: 0 },
+      { q: 'Kto namalowal "Ostatnia Wieczerze"?', options: ['Leonardo da Vinci', 'Michal Aniol', 'Rafael', 'Caravaggio'], correct: 0 },
+      { q: 'Jaka jest jednostka natezenia pradu elektrycznego?', options: ['Amper', 'Wolt', 'Om', 'Wat'], correct: 0 },
+      { q: 'Ktora planeta Ukladu Slonecznego jest najwieksza?', options: ['Jowisz', 'Saturn', 'Uran', 'Neptun'], correct: 0 },
+      { q: 'Kto napisal "Romeo i Julie"?', options: ['William Szekspir', 'Charles Dickens', 'Moliere', 'Wiktor Hugo'], correct: 0 },
+      { q: 'Jak nazywa sie proces zamiany wody w pare?', options: ['Parowanie', 'Skraplanie', 'Topnienie', 'Sublimacja'], correct: 0 },
+    ],
+    trudny: [
+      { q: 'Kto sformulowal prawa ruchu i grawitacji w XVII wieku?', options: ['Isaac Newton', 'Galileusz', 'Kopernik', 'Kepler'], correct: 0 },
+      { q: 'Jaki pierwiastek ma symbol chemiczny "Fe"?', options: ['Zelazo', 'Fluor', 'Frans', 'Fosfor'], correct: 0 },
+      { q: 'Kto napisal powiesc "Zbrodnia i kara"?', options: ['Fiodor Dostojewski', 'Lew Tolstoj', 'Anton Czechow', 'Iwan Turgieniew'], correct: 0 },
+      { q: 'Jak nazywa sie teoria opisujaca zakrzywienie czasoprzestrzeni przez mase, autorstwa Einsteina?', options: ['Ogolna teoria wzglednosci', 'Szczegolna teoria wzglednosci', 'Mechanika kwantowa', 'Teoria strun'], correct: 0 },
+      { q: 'Ktory naukowiec jako pierwszy opisal podstawowe prawa dziedziczenia cech na przykladzie grochu?', options: ['Gregor Mendel', 'Karol Darwin', 'Louis Pasteur', 'James Watson'], correct: 0 },
+      { q: 'Jak nazywa sie najmniejsza czastka materii zachowujaca wlasciwosci chemiczne pierwiastka?', options: ['Atom', 'Czasteczka', 'Proton', 'Elektron'], correct: 0 },
+      { q: 'Kto skomponowal IX Symfonie z czescia "Oda do radosci"?', options: ['Ludwig van Beethoven', 'Wolfgang Amadeusz Mozart', 'Johann Sebastian Bach', 'Johannes Brahms'], correct: 0 },
+      { q: 'Jak nazywa sie proces, w ktorym rosliny produkuja energie ze swiatla slonecznego?', options: ['Fotosynteza', 'Oddychanie komorkowe', 'Fermentacja', 'Transpiracja'], correct: 0 },
+    ],
+  },
 };
 
 // Przetasuj opcje odpowiedzi tak, by poprawna nie byla zawsze na tej samej pozycji.
