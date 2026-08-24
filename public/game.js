@@ -143,16 +143,42 @@
     return pool;
   }
 
-  function buildPile(category, difficulty) {
-    const pool = collectQuestions(category, difficulty);
-    return shuffle(pool).map(shuffleOptions);
+  // Tasuje pule tak, by pytania dawno niezadawane trafily na wierzch talii
+  // (dobieramy przez pop(), wiec wierzch to koniec tablicy).
+  function shuffleFreshFirst(pool, recent) {
+    const seen = shuffle(pool.filter((q) => recent.has(q.q)));
+    const fresh = shuffle(pool.filter((q) => !recent.has(q.q)));
+    return seen.concat(fresh);
   }
 
+  // Buduje obie talie naraz, pilnujac by to samo pytanie nie trafilo do obu
+  // (przy kategorii "mix"/"losowa" obie talie czerpia z tej samej puli).
   function buildDeck() {
-    return {
-      a: buildPile(state.categoryA, state.difficulty),
-      b: buildPile(state.categoryB, state.difficulty),
-    };
+    const recent = window.loadRecentQuestions();
+    const poolA = shuffleFreshFirst(collectQuestions(state.categoryA, state.difficulty), recent);
+    const poolB = shuffleFreshFirst(collectQuestions(state.categoryB, state.difficulty), recent);
+
+    const used = new Set();
+    const a = [];
+    const b = [];
+    let ia = 0;
+    let ib = 0;
+    // Rozdajemy na przemian, pomijajac pytania juz przydzielone drugiej talii.
+    while (ia < poolA.length || ib < poolB.length) {
+      while (ia < poolA.length && used.has(poolA[ia].q)) ia += 1;
+      if (ia < poolA.length) {
+        used.add(poolA[ia].q);
+        a.push(poolA[ia]);
+        ia += 1;
+      }
+      while (ib < poolB.length && used.has(poolB[ib].q)) ib += 1;
+      if (ib < poolB.length) {
+        used.add(poolB[ib].q);
+        b.push(poolB[ib]);
+        ib += 1;
+      }
+    }
+    return { a: a.map(shuffleOptions), b: b.map(shuffleOptions) };
   }
 
   // --- Game flow ---
@@ -206,6 +232,7 @@
     const question = state.piles[pileKey].pop();
     state.activeQuestion = question;
     state.activePile = pileKey;
+    window.rememberQuestions([question.q]);
     renderPiles();
     showQuestion(question);
   }

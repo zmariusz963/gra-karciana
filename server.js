@@ -74,16 +74,54 @@ function collectQuestions(category, difficulty) {
   return pool;
 }
 
-function buildPile(category, difficulty) {
-  const pool = collectQuestions(category, difficulty);
-  return shuffle(pool).map(shuffleOptions);
+// Ostatnio zadane pytania (globalnie na serwerze) - kolejne pokoje zaczynaja
+// od pytan, ktorych dawno nie bylo, zamiast powtarzac wciaz te same.
+const recentQuestions = [];
+const RECENT_LIMIT = 120;
+
+function rememberQuestion(text) {
+  const existing = recentQuestions.indexOf(text);
+  if (existing !== -1) recentQuestions.splice(existing, 1);
+  recentQuestions.unshift(text);
+  if (recentQuestions.length > RECENT_LIMIT) recentQuestions.length = RECENT_LIMIT;
 }
 
+// Tasuje pule tak, by pytania dawno niezadawane trafily na wierzch talii
+// (dobieramy przez pop(), wiec wierzch to koniec tablicy).
+function shuffleFreshFirst(pool, recent) {
+  const seen = shuffle(pool.filter((q) => recent.has(q.q)));
+  const fresh = shuffle(pool.filter((q) => !recent.has(q.q)));
+  return seen.concat(fresh);
+}
+
+// Buduje obie talie naraz, pilnujac by to samo pytanie nie trafilo do obu
+// (przy kategorii "mix"/"losowa" obie talie czerpia z tej samej puli).
 function buildDeck(categoryA, categoryB, difficulty) {
-  return {
-    a: buildPile(categoryA, difficulty),
-    b: buildPile(categoryB, difficulty),
-  };
+  const recent = new Set(recentQuestions);
+  const poolA = shuffleFreshFirst(collectQuestions(categoryA, difficulty), recent);
+  const poolB = shuffleFreshFirst(collectQuestions(categoryB, difficulty), recent);
+
+  const used = new Set();
+  const a = [];
+  const b = [];
+  let ia = 0;
+  let ib = 0;
+  // Rozdajemy na przemian, pomijajac pytania juz przydzielone drugiej talii.
+  while (ia < poolA.length || ib < poolB.length) {
+    while (ia < poolA.length && used.has(poolA[ia].q)) ia += 1;
+    if (ia < poolA.length) {
+      used.add(poolA[ia].q);
+      a.push(poolA[ia]);
+      ia += 1;
+    }
+    while (ib < poolB.length && used.has(poolB[ib].q)) ib += 1;
+    if (ib < poolB.length) {
+      used.add(poolB[ib].q);
+      b.push(poolB[ib]);
+      ib += 1;
+    }
+  }
+  return { a: a.map(shuffleOptions), b: b.map(shuffleOptions) };
 }
 
 function send(ws, msg) {
@@ -250,6 +288,7 @@ wss.on('connection', (ws) => {
       const q = room.piles[pileKey].pop();
       room.activeQuestion = q;
       room.answered = false;
+      rememberQuestion(q.q);
       const deadline = Date.now() + ANSWER_TIME_MS;
       broadcast(room, {
         type: 'question',

@@ -133,4 +133,33 @@
   window.recordGameResult = recordGameResult;
   window.renderWinsTable = renderWinsTable;
   renderWinsTable();
+
+  // Pamiec ostatnio zadanych pytan - dzieki niej kolejne gry zaczynaja sie
+  // od pytan, ktorych dawno nie bylo, zamiast powtarzac te same.
+  const RECENT_KEY = 'gra-karciana-recent';
+  const RECENT_LIMIT = 120;
+
+  function loadRecentQuestions() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(RECENT_KEY)) || []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  function rememberQuestions(questionTexts) {
+    if (!questionTexts || !questionTexts.length) return;
+    let recent = [];
+    try {
+      recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    } catch {
+      recent = [];
+    }
+    // Najnowsze na poczatku, obcinamy ogon powyzej limitu.
+    const merged = questionTexts.concat(recent.filter((q) => !questionTexts.includes(q)));
+    localStorage.setItem(RECENT_KEY, JSON.stringify(merged.slice(0, RECENT_LIMIT)));
+  }
+
+  window.loadRecentQuestions = loadRecentQuestions;
+  window.rememberQuestions = rememberQuestions;
 })();
