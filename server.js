@@ -93,12 +93,18 @@ function publicPlayers(room) {
   return room.players.map((p) => ({ id: p.id, name: p.name, score: p.score }));
 }
 
+// Kategoria karty lezacej na wierzchu talii - ta, ktora gracz dostanie po kliknieciu.
+function peekCategory(pile) {
+  return pile.length ? pile[pile.length - 1].sourceCategory : null;
+}
+
 function roomStatePayload(room) {
   return {
     code: room.code,
     players: publicPlayers(room),
     currentPlayerId: room.players[room.currentIndex] ? room.players[room.currentIndex].id : null,
     pileCounts: { a: room.piles.a.length, b: room.piles.b.length },
+    nextCategories: { a: peekCategory(room.piles.a), b: peekCategory(room.piles.b) },
     started: room.started,
     hostId: room.players[0] ? room.players[0].id : null,
     categoryA: room.categoryA,
@@ -245,6 +251,7 @@ wss.on('connection', (ws) => {
         pile: pileKey,
         question: { q: q.q, options: q.options, sourceCategory: q.sourceCategory },
         pileCounts: { a: room.piles.a.length, b: room.piles.b.length },
+        nextCategories: { a: peekCategory(room.piles.a), b: peekCategory(room.piles.b) },
         deadline,
         currentPlayerId: current.id,
       });

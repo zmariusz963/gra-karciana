@@ -196,8 +196,6 @@
       case 'game_start':
         state.liveStats = {};
         applyRoomState(msg.state);
-        pileACat.textContent = window.CATEGORY_LABELS[msg.state.categoryA] || 'Talia A';
-        pileBCat.textContent = window.CATEGORY_LABELS[msg.state.categoryB] || 'Talia B';
         questionOverlay.classList.add('hidden');
         showScreen('screen-online-game');
         renderGameHeader();
@@ -244,6 +242,7 @@
       pileA.disabled = s.pileCounts.a === 0 || state.currentPlayerId !== state.myId;
       pileB.disabled = s.pileCounts.b === 0 || state.currentPlayerId !== state.myId;
     }
+    if (s.nextCategories) renderPileCategories(s.nextCategories);
     renderLobby();
   }
 
@@ -298,6 +297,12 @@
     drawHint.textContent = myTurn ? 'Twoja tura - wybierz talie' : 'Czekaj na swoja ture...';
   }
 
+  // Etykiety talii pokazuja kategorie karty na wierzchu - ta, ktora gracz dostanie po kliknieciu.
+  function renderPileCategories(nextCategories) {
+    pileACat.textContent = window.CATEGORY_LABELS[nextCategories.a] || '-';
+    pileBCat.textContent = window.CATEGORY_LABELS[nextCategories.b] || '-';
+  }
+
   function renderPiles() {
     const myTurn = state.currentPlayerId === state.myId;
     pileA.disabled = !myTurn || pileACount.textContent === '0';
@@ -310,9 +315,7 @@
   function showQuestion(msg) {
     state.answered = false;
     state.activeCorrectIdx = null;
-    const catLabel = window.CATEGORY_LABELS[msg.question.sourceCategory] || '';
-    if (msg.pile === 'b') pileBCat.textContent = catLabel;
-    else pileACat.textContent = catLabel;
+    if (msg.nextCategories) renderPileCategories(msg.nextCategories);
     pileACount.textContent = msg.pileCounts.a;
     pileBCount.textContent = msg.pileCounts.b;
     pileA.disabled = true;
@@ -378,8 +381,13 @@
     disableAnswerButtons();
     const buttons = [...answersGrid.querySelectorAll('.answer-btn')];
     buttons.forEach((btn, idx) => {
-      if (idx === msg.correctIdx) btn.classList.add('correct');
-      else if (idx === msg.chosenIdx) btn.classList.add('wrong');
+      if (idx === msg.correctIdx) {
+        btn.classList.add('correct');
+        if (idx === msg.chosenIdx) window.celebrateAt(btn);
+      } else if (idx === msg.chosenIdx) {
+        btn.classList.add('wrong');
+        window.explodeAt(btn);
+      }
     });
     const responder = state.players.find((p) => p.id === msg.playerId);
     const isMe = msg.playerId === state.myId;

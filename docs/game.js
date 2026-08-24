@@ -164,8 +164,6 @@
     }));
     state.currentPlayerIndex = 0;
     state.piles = buildDeck();
-    pileACat.textContent = window.CATEGORY_LABELS[state.categoryA] || 'Losowo';
-    pileBCat.textContent = window.CATEGORY_LABELS[state.categoryB] || 'Losowo';
     showScreen('screen-game');
     renderGameHeader();
     renderPiles();
@@ -183,9 +181,18 @@
       .join('');
   }
 
+  // Kategoria karty lezacej na wierzchu talii - ta, ktora gracz dostanie po kliknieciu.
+  function peekCategoryLabel(pileKey) {
+    const pile = state.piles[pileKey];
+    if (!pile.length) return '-';
+    return window.CATEGORY_LABELS[pile[pile.length - 1].sourceCategory] || '-';
+  }
+
   function renderPiles() {
     pileACount.textContent = state.piles.a.length;
     pileBCount.textContent = state.piles.b.length;
+    pileACat.textContent = peekCategoryLabel('a');
+    pileBCat.textContent = peekCategoryLabel('b');
     pileA.disabled = state.piles.a.length === 0;
     pileB.disabled = state.piles.b.length === 0;
 
@@ -199,9 +206,6 @@
     const question = state.piles[pileKey].pop();
     state.activeQuestion = question;
     state.activePile = pileKey;
-    const catLabel = window.CATEGORY_LABELS[question.sourceCategory] || '';
-    if (pileKey === 'a') pileACat.textContent = catLabel;
-    else pileBCat.textContent = catLabel;
     renderPiles();
     showQuestion(question);
   }
@@ -298,8 +302,13 @@
     const buttons = answersGrid.querySelectorAll('.answer-btn');
     buttons.forEach((btn, idx) => {
       btn.disabled = true;
-      if (idx === state.activeQuestion.correct) btn.classList.add('correct');
-      else if (idx === chosenIdx) btn.classList.add('wrong');
+      if (idx === state.activeQuestion.correct) {
+        btn.classList.add('correct');
+        if (idx === chosenIdx) window.celebrateAt(btn);
+      } else if (idx === chosenIdx) {
+        btn.classList.add('wrong');
+        window.explodeAt(btn);
+      }
     });
   }
 

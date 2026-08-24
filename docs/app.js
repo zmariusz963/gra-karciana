@@ -44,6 +44,35 @@
   }
   window.beepAndVibrate = beepAndVibrate;
 
+  // Efekt rozlatujacych sie emotek - wybuch przy blednej odpowiedzi, ptaszki przy poprawnej.
+  function spawnParticles(element, symbols, count) {
+    if (!element) return;
+    const rect = element.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'explosion-particle';
+      particle.textContent = symbols[i % symbols.length];
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const dist = 50 + Math.random() * 50;
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+      particle.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+      particle.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 650);
+    }
+  }
+  function explodeAt(element) {
+    spawnParticles(element, ['💣', '💥', '🔥', '💢'], 12);
+  }
+  function celebrateAt(element) {
+    spawnParticles(element, ['✅', '🎉'], 10);
+  }
+  window.explodeAt = explodeAt;
+  window.celebrateAt = celebrateAt;
+
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-back-to]');
     if (!btn) return;
