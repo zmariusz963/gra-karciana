@@ -29,7 +29,12 @@ const server = http.createServer((req, res) => {
       res.end('Not found');
       return;
     }
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'text/plain' });
+    // Bez cache dla HTML/JS/CSS - zapobiega serwowaniu przez przegladarke/CDN
+    // starej wersji gry po wdrozeniu poprawek.
+    res.writeHead(200, {
+      'Content-Type': MIME[ext] || 'text/plain',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+    });
     res.end(data);
   });
 });
