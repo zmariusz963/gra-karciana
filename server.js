@@ -6,7 +6,8 @@ const { QUESTIONS, shuffleOptions } = require('./public/questions.js');
 
 const PORT = process.env.PORT || 3002;
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const ANSWER_TIME_MS = 15000;
+const DEFAULT_ANSWER_TIME_MS = 15000;
+const ALLOWED_ANSWER_TIMES_MS = [5000, 10000, 15000, 20000, 30000];
 const MAX_PLAYERS = 4;
 
 const MIME = {
@@ -222,6 +223,7 @@ wss.on('connection', (ws) => {
         categoryA: msg.categoryA || 'polska',
         categoryB: msg.categoryB || 'swiat',
         difficulty: msg.difficulty || 'latwy',
+        answerTimeMs: ALLOWED_ANSWER_TIMES_MS.includes(msg.answerTimeMs) ? msg.answerTimeMs : DEFAULT_ANSWER_TIME_MS,
         piles: { a: [], b: [] },
         currentIndex: 0,
         activeQuestion: null,
@@ -289,7 +291,7 @@ wss.on('connection', (ws) => {
       room.activeQuestion = q;
       room.answered = false;
       rememberQuestion(q.q);
-      const deadline = Date.now() + ANSWER_TIME_MS;
+      const deadline = Date.now() + room.answerTimeMs;
       broadcast(room, {
         type: 'question',
         pile: pileKey,
@@ -297,10 +299,11 @@ wss.on('connection', (ws) => {
         pileCounts: { a: room.piles.a.length, b: room.piles.b.length },
         nextCategories: { a: peekCategory(room.piles.a), b: peekCategory(room.piles.b) },
         deadline,
+        answerTimeMs: room.answerTimeMs,
         currentPlayerId: current.id,
       });
       clearTimeout(room.timerHandle);
-      room.timerHandle = setTimeout(() => resolveAnswer(room, null), ANSWER_TIME_MS + 300);
+      room.timerHandle = setTimeout(() => resolveAnswer(room, null), room.answerTimeMs + 300);
       return;
     }
 

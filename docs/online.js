@@ -8,6 +8,7 @@
     categoryA: 'polska',
     categoryB: 'swiat',
     difficulty: 'latwy',
+    answerTimeMs: 15000,
     players: [],
     currentPlayerId: null,
     hostId: null,
@@ -27,6 +28,7 @@
   const categoryASelect = document.getElementById('online-category-a-select');
   const categoryBSelect = document.getElementById('online-category-b-select');
   const difficultyRow = document.getElementById('online-difficulty-row');
+  const answerTimeRow = document.getElementById('online-answer-time-row');
   const createRoomBtn = document.getElementById('create-room-btn');
   const joinCodeInput = document.getElementById('join-code-input');
   const joinRoomBtn = document.getElementById('join-room-btn');
@@ -113,6 +115,14 @@
     state.difficulty = btn.dataset.value;
   });
 
+  answerTimeRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.choice-btn');
+    if (!btn) return;
+    answerTimeRow.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.answerTimeMs = Number(btn.dataset.value) * 1000;
+  });
+
   // --- Polaczenie WebSocket ---
   function connect(onOpen) {
     if (state.ws && state.ws.readyState === WebSocket.OPEN) {
@@ -157,7 +167,7 @@
     }
     showError('');
     connect(() => {
-      send({ type: 'create', name: state.myName, categoryA: state.categoryA, categoryB: state.categoryB, difficulty: state.difficulty });
+      send({ type: 'create', name: state.myName, categoryA: state.categoryA, categoryB: state.categoryB, difficulty: state.difficulty, answerTimeMs: state.answerTimeMs });
     });
   });
 
@@ -346,16 +356,16 @@
     });
 
     questionOverlay.classList.remove('hidden');
-    startTimer(msg.deadline);
+    startTimer(msg.deadline, msg.answerTimeMs);
   }
 
   function disableAnswerButtons() {
     answersGrid.querySelectorAll('.answer-btn').forEach((b) => (b.disabled = true));
   }
 
-  function startTimer(deadline) {
+  function startTimer(deadline, totalMs) {
     clearInterval(state.timerInterval);
-    const total = ANSWER_TIME_MS_CLIENT;
+    const total = totalMs || 15000;
     state.lowTimeAlerted = false;
     function tick() {
       const remaining = Math.max(0, deadline - Date.now());
@@ -373,7 +383,6 @@
     timerFill.style.transition = 'transform 0.1s linear';
     state.timerInterval = setInterval(tick, 100);
   }
-  const ANSWER_TIME_MS_CLIENT = 15000;
 
   function handleAnswerResult(msg) {
     clearInterval(state.timerInterval);

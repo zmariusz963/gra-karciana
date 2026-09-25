@@ -1,10 +1,9 @@
 (function () {
-  const ANSWER_TIME_MS = 15000;
-
   const state = {
     categoryA: 'polska',
     categoryB: 'swiat',
     difficulty: 'latwy',
+    answerTimeMs: 15000,
     playerCount: 2,
     playerNames: [],
     players: [],
@@ -13,7 +12,7 @@
     activeQuestion: null,
     activePile: null,
     timerInterval: null,
-    timeLeft: ANSWER_TIME_MS,
+    timeLeft: 15000,
     answered: false,
   };
 
@@ -22,6 +21,7 @@
   const categoryASelect = document.getElementById('category-a-select');
   const categoryBSelect = document.getElementById('category-b-select');
   const difficultyRow = document.getElementById('difficulty-row');
+  const answerTimeRow = document.getElementById('answer-time-row');
   const playersCountEl = document.getElementById('players-count');
   const namesList = document.getElementById('names-list');
   const startBtn = document.getElementById('start-btn');
@@ -71,6 +71,14 @@
     difficultyRow.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
     state.difficulty = btn.dataset.value;
+  });
+
+  answerTimeRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.choice-btn');
+    if (!btn) return;
+    answerTimeRow.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.answerTimeMs = Number(btn.dataset.value) * 1000;
   });
 
   document.getElementById('players-minus').addEventListener('click', () => {
@@ -258,21 +266,22 @@
   }
 
   function startTimer() {
-    state.timeLeft = ANSWER_TIME_MS;
+    const totalMs = state.answerTimeMs;
+    state.timeLeft = totalMs;
     state.lowTimeAlerted = false;
     timerFill.style.transition = 'none';
     timerFill.style.transform = 'scaleX(1)';
     timerNumber.textContent = Math.ceil(state.timeLeft / 1000);
     // force reflow so the transition below applies cleanly
     void timerFill.offsetWidth;
-    timerFill.style.transition = `transform ${ANSWER_TIME_MS}ms linear`;
+    timerFill.style.transition = `transform ${totalMs}ms linear`;
     timerFill.style.transform = 'scaleX(0)';
 
     const startedAt = Date.now();
     clearInterval(state.timerInterval);
     state.timerInterval = setInterval(() => {
       const elapsed = Date.now() - startedAt;
-      const remaining = Math.max(0, ANSWER_TIME_MS - elapsed);
+      const remaining = Math.max(0, totalMs - elapsed);
       timerNumber.textContent = Math.ceil(remaining / 1000);
       if (remaining <= 1000 && !state.lowTimeAlerted) {
         state.lowTimeAlerted = true;
